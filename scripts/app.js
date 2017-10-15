@@ -253,35 +253,33 @@ APP.Main = (function() {
    * of work in a cheaper way?
    */
   function colorizeAndScaleStories() {
+    var height = main.offsetHeight;
 
-    var storyElements = document.querySelectorAll('.story');
+    var scales = [];
+    var opacities = [];
+    var saturations = [];
 
-    // It does seem awfully broad to change all the
-    // colors every time!
-    for (var s = 0; s < storyElements.length; s++) {
+    var storyElements = [].slice.call(document.querySelectorAll('.story'));
+    var scores = storyElements.map(function (storyElement) {
+      return storyElement.querySelector('.story__score');
+    });
+    var titles = storyElements.map(function (storyElement) {
+      return storyElement.querySelector('.story__title');
+    });
 
-      var story = storyElements[s];
-      var score = story.querySelector('.story__score');
-      var title = story.querySelector('.story__title');
-
-      // Base the scale on the y position of the score.
-      var height = main.offsetHeight;
-      var mainPosition = main.getBoundingClientRect();
-      var scoreLocation = score.getBoundingClientRect().top -
-          document.body.getBoundingClientRect().top;
+    for (var i = 0; i < storyElements.length; i++) {
+      var scoreLocation = scores[i].getBoundingClientRect().top;
       var scale = Math.min(1, 1 - (0.05 * ((scoreLocation - 170) / height)));
       var opacity = Math.min(1, 1 - (0.5 * ((scoreLocation - 170) / height)));
+      var saturation = (100 * ((scale * 40 - 38) / 2));
+      scales.push(scale);
+      opacities.push(opacity);
+      saturations.push(saturation);
+    }
 
-      score.style.width = (scale * 40) + 'px';
-      score.style.height = (scale * 40) + 'px';
-      score.style.lineHeight = (scale * 40) + 'px';
-
-      // Now figure out how wide it is and use that to saturate it.
-      scoreLocation = score.getBoundingClientRect();
-      var saturation = (100 * ((scoreLocation.width - 38) / 2));
-
-      score.style.backgroundColor = 'hsl(42, ' + saturation + '%, 50%)';
-      title.style.opacity = opacity;
+    for (var s = 0; s < storyElements.length; s++) {
+      scores[s].style.backgroundColor = 'hsl(42, ' + saturations[s] + '%, 50%)';
+      titles[s].style.opacity = opacities[s];
     }
   }
 
@@ -316,7 +314,7 @@ APP.Main = (function() {
 
     // Check if we need to load the next batch of stories.
     var loadThreshold = (main.scrollHeight - main.offsetHeight -
-        LAZY_LOAD_THRESHOLD);
+    LAZY_LOAD_THRESHOLD);
     if (main.scrollTop > loadThreshold)
       loadStoryBatch();
   });

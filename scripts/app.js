@@ -177,10 +177,9 @@ APP.Main = (function() {
     document.body.classList.add('details-active');
     storyDetails.style.opacity = 1;
 
-    function animate () {
+    var storyDetailsPosition = storyDetails.getBoundingClientRect();
 
-      // Find out where it currently is.
-      var storyDetailsPosition = storyDetails.getBoundingClientRect();
+    function animate (timestamp) {
 
       // Set the left value if we don't have one already.
       if (left === null)
@@ -191,7 +190,7 @@ APP.Main = (function() {
 
       // Set up the next bit of the animation if there is more to do.
       if (Math.abs(left) > 0.5)
-        setTimeout(animate, 4);
+        window.requestAnimationFrame(animate);
       else
         left = 0;
 
@@ -200,11 +199,7 @@ APP.Main = (function() {
       storyDetails.style.left = left + 'px';
     }
 
-    // We want slick, right, so let's do a setTimeout
-    // every few milliseconds. That's going to keep
-    // it all tight. Or maybe we're doing visual changes
-    // and they should be in a requestAnimationFrame
-    setTimeout(animate, 4);
+    window.requestAnimationFrame(animate);
   }
 
   function hideStory(id) {
@@ -218,11 +213,12 @@ APP.Main = (function() {
     document.body.classList.remove('details-active');
     storyDetails.style.opacity = 0;
 
+    var mainPosition = main.getBoundingClientRect();
+    var storyDetailsPosition = storyDetails.getBoundingClientRect();
+
     function animate () {
 
       // Find out where it currently is.
-      var mainPosition = main.getBoundingClientRect();
-      var storyDetailsPosition = storyDetails.getBoundingClientRect();
       var target = mainPosition.width + 100;
 
       // Now figure out where it needs to go.
@@ -230,7 +226,7 @@ APP.Main = (function() {
 
       // Set up the next bit of the animation if there is more to do.
       if (Math.abs(left - target) > 0.5) {
-        setTimeout(animate, 4);
+        window.requestAnimationFrame(animate);
       } else {
         left = target;
         inDetails = false;
@@ -241,11 +237,7 @@ APP.Main = (function() {
       storyDetails.style.left = left + 'px';
     }
 
-    // We want slick, right, so let's do a setTimeout
-    // every few milliseconds. That's going to keep
-    // it all tight. Or maybe we're doing visual changes
-    // and they should be in a requestAnimationFrame
-    setTimeout(animate, 4);
+    window.requestAnimationFrame(animate);
   }
 
   /**
